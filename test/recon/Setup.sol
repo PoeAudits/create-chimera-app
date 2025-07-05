@@ -11,12 +11,12 @@ import {AssetManager} from "@recon/AssetManager.sol";
 
 // Helpers
 import {Utils} from "@recon/Utils.sol";
+import "./Harness.sol";
 
 // Your deps
-import "src/Counter.sol";
 
 abstract contract Setup is BaseSetup, ActorManager, AssetManager, Utils {
-    Counter counter;
+    Harness target;
 
     /// === Setup === ///
     /// This contains all calls to be performed in the tester constructor, both for Echidna and Foundry
@@ -25,23 +25,23 @@ abstract contract Setup is BaseSetup, ActorManager, AssetManager, Utils {
         _addActor(address(0x411c3));
         _newAsset(18); // New 18 decimals token
 
-        counter = new Counter();
+        target = new Harness();
 
         // Mints to all actors and approves allowances to the counter
         address[] memory approvalArray = new address[](1);
-        approvalArray[0] = address(counter);
+        approvalArray[0] = address(target);
         _finalizeAssetDeployment(_getActors(), approvalArray, type(uint88).max);
     }
 
     /// === MODIFIERS === ///
     /// Prank admin and actor
-    
-    modifier asAdmin {
+
+    modifier asAdmin() {
         vm.prank(address(this));
         _;
     }
 
-    modifier asActor {
+    modifier asActor() {
         vm.prank(address(_getActor()));
         _;
     }
